@@ -1,25 +1,35 @@
-// const WebSocket = require('ws');
-
-// const wss = new WebSocket.Server({ port: 3030 });
-
-// wss.on('connection', socket =>  {
-//   socket.on('message', message => {
-//     wss.clients.forEach(function each(client) {
-//       if (client !== ws && client.readyState === WebSocket.OPEN) {
-//         client.send(message);
-//       }
-//     });
-//   });
-// });
-
 const PORT = process.env.PORT || 8000;
 
 const app = require("./application")({ addText });
 const server = require("http").Server(app);
 
 
-function addText() {
-  console.log("Add text")
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ server });
+
+wss.on('connection', socket =>  {
+  socket.onmessage = message => {
+    console.log(`Message Received: ${message.data}`);
+
+    if (message.data === "ping") {
+      socket.send(JSON.stringify("pong"));
+    }
+
+  };
+});
+
+
+function addText(msg) {
+  wss.clients.forEach(function eachClient(client) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(
+        JSON.stringify({
+          type: "UPDATE_CHAT",
+          msg
+        })
+      );
+    }
+  });
 }
 
 

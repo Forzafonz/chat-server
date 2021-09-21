@@ -16,12 +16,13 @@ module.exports = function(router, addText) {
   router.put(`/messages/new`, (req, res) => {
     insertTextMessages(req.body.message.values)
       .then((data) => {
+        console.log(req.body.message.values)
+        addText(req.body.message.values)
         res
         .status(200)
         .json(data)
       });
   });
-
 
   return router;
 
